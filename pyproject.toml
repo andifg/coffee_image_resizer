@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "resize"
+version = "0.1.0"
+description = ""
+authors = ["anixel <45008199+andifg@users.noreply.github.com>"]
+readme = "Readme.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+kafka-python = "^2.0.2"
+confluent-kafka = "^2.3.0"
+pillow = "^10.2.0"
+aiokafka = "^0.10.0"
+minio = "^7.2.4"
+pydantic-settings = "^2.2.1"
+
+
+[tool.poetry.group.dev.dependencies]
+pylint = "^3.1.0"
+types-confluent-kafka = "^1.2.0"
+mypy = "^1.8.0"
+black = "^24.2.0"
+isort = "^5.13.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
