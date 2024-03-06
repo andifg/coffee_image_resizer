@@ -2,6 +2,7 @@ from resize.s3.objectCRUD import ObjectCRUD
 from resize.settings import settings
 from minio import Minio
 from resize.exceptions import ObjectNotFoundError
+from resize.resizer.resize import ImageResizer
 
 
 class S3Service:
@@ -16,17 +17,29 @@ class S3Service:
             bucket_name=settings.minio_coffee_images_bucket,
         )
 
+        self.image_resizer = ImageResizer()
+
     async def handle_kafka_message(self, key: str, value: str) -> None:
         print(f"Handling message: {key} - {value}")
 
 
-        _ , object_path = key.split('/', 1)
+        _ , prefix, object_path = key.split('/')
 
 
         try:
-            image = self.object_crud.read(object_path=object_path)
+            image, filetype = self.object_crud.read(object_path=f"{prefix}/{object_path}")
 
             print("Read image")
+
+            resized_image = self.image_resizer.reduze_quality(image)
+
+            self.object_crud.create(
+                filename=object_path,
+                file=resized_image,
+                file_type=filetype,
+                prefix="small",
+            )
+
 
         except ObjectNotFoundError:
             print(f"Object not found: {key}")

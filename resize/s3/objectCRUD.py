@@ -26,7 +26,7 @@ class ObjectCRUD:
         self.client = minio_client
         self.bucket_name = bucket_name
 
-    def create(self, filename: str, file: Readable, file_type: str) -> None:
+    def create(self, filename: str, file: Readable, file_type: str, prefix: str) -> None:
         """Create an object in the S3 bucket.
 
         Args:
@@ -40,7 +40,7 @@ class ObjectCRUD:
         """
         result = self.client.put_object(
             bucket_name=self.bucket_name,
-            object_name=f"{settings.minio_original_images_prefix}/{filename}",
+            object_name=f"{prefix}/{filename}",
             data=file,
             length=-1,
             part_size=10 * 1024 * 1024,
@@ -88,29 +88,3 @@ class ObjectCRUD:
         filetype = result.headers.get("x-amz-meta-filetype", "")
 
         return result.data, filetype
-
-    def delete(self, filename: str) -> None:
-        """Delete an object from the S3 bucket recursively with all versions.
-
-        Args:
-            filename (str): The name of the object to be deleted.
-
-        Returns:
-            None
-
-        """
-
-        delete_object_list = [
-            DeleteObject(object.object_name, object.version_id)
-            for object in self.client.list_objects(
-                "coffee-images",
-                f"original/{filename}",
-                recursive=True,
-                include_version=True,
-            )
-        ]
-
-        errors = self.client.remove_objects("coffee-images", delete_object_list)
-
-        for error in errors:
-            print("error occurred when deleting object", error)

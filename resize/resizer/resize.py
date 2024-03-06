@@ -4,86 +4,28 @@ import sys
 import os
 import io
 
-# Get the current working directory
-dir = sys.path[0]
-execution_path = os.getcwd()
 
+class ImageResizer:
 
-buf = io.BytesIO()
+    def reduze_quality(self,image_data: bytes, quality: int = 20):
 
-# print("The current working directory is:", dir)
-# print("The current working directory is:", execution_path)
+        image = Image.open(io.BytesIO(image_data))
 
-# Open the image by specifying the image path.
-image_path = f"{execution_path}/test.jpg"
-print("The image path is:", image_path)
-image_file: Image = Image.open(image_path)
+        new_byte = io.BytesIO()
 
+        image.save(new_byte, format="JPEG", quality=quality)
 
-# the default
-image_file.save("image_name.jpg", quality=20)
+        size = round(len(new_byte.getvalue()) / (1024 * 1024), 2)
 
+        print(
+        f"File Size in MegaBytes is {size} for qaulity {quality}"
+        )
 
-file_stats_new = os.stat("image_name.jpg")
-file_stats_old = os.stat(image_path)
+        new_byte.seek(0)
 
-# Save to buffer
+        if size > 0.3 and quality > 5:
+            print("Image size is greater than 0.3 MB")
+            return self.reduze_quality(image_data, quality=quality - 3)
 
-image_file.save(buf, format="JPEG", quality=20)
-
-
-print(f"File Size in MegaBytes is { round(file_stats_old.st_size / (1024 * 1024), 2)}")
-
-w, h = image_file.size
-print("width: ", w)
-print("height:", h)
-print("#######################")
-
-print(f"File Size in MegaBytes is { round(file_stats_new.st_size / (1024 * 1024), 2)}")
-w_new, h_new = Image.open("image_name.jpg").size
-print("width: ", w_new)
-print("height:", h_new)
-
-
-print("#######################")
-print(f"File Size in MegaBytes is { round(len(buf.getvalue()) / (1024 * 1024), 2)}")
-w_new, h_new = Image.open(io.BytesIO(buf.getvalue())).size
-print("width: ", w_new)
-print("height:", h_new)
-
-print("#######################")
-
-# Set the image size and color
-width, height = 3024, 4032
-red_color = (255, 0, 0)  # RGB values for red
-
-# Create a new image with a red background
-image = Image.new("RGB", (width, height), red_color)
-
-print(
-    "Image in Buffer size: ", round(sys.getsizeof(image.tobytes()) / (1024 * 1024), 2)
-)
-
-# Save the image to the current working directory
-
-new_byte = io.BytesIO()
-
-image.save("red_image.jpg")
-
-image.save(new_byte, format="JPEG")
-
-print(
-    f"File Size in MegaBytes is { round(len(new_byte.getvalue()) / (1024 * 1024), 2)}"
-)
-
-
-def resize_image():
-    pass
-
-
-# # Changing the image resolution using quality parameter
-# # Example-1
-# image_file.save("image_name2.jpg", quality=25)
-
-# # Example-2
-# image_file.save("image_name3.jpg", quality=1)
+        else:
+            return new_byte
