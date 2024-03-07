@@ -19,7 +19,7 @@ class Consumer:
         )
         self.message_handler = message_handler
 
-    async def consume(self):
+    async def consume(self) -> None:
         await self.consumer.start()
         logging.info("consumer started")
         async for msg in self.consumer:
@@ -27,7 +27,7 @@ class Consumer:
             await self.consumer.commit()
             logging.info("Handled message and committed")
 
-    async def _process_message(self):
+    async def _process_message(self, msg: ConsumerRecord) -> None:
         raise NotImplementedError("Not implemented")
 
 
@@ -35,7 +35,7 @@ class ResizerConsumer(Consumer):
     def __init__(self, message_handler: MessageHandler):
         super().__init__(message_handler=message_handler)
 
-    async def _process_message(self, msg: ConsumerRecord):
+    async def _process_message(self, msg: ConsumerRecord)-> None:
         logging.info(
             "consumed: ",
             msg.topic,
