@@ -5,7 +5,7 @@ from minio import S3Error  # type: ignore
 from minio.deleteobjects import DeleteObject  # type: ignore
 
 from resize.exceptions import ObjectNotFoundError
-from resize.s3.types.readable import Readable
+from resize.types import Readable
 from resize.settings import settings
 
 

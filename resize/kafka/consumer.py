@@ -2,10 +2,8 @@ import json
 from typing import Protocol
 
 from aiokafka import AIOKafkaConsumer, ConsumerRecord
+from resize.types import MessageHandler
 
-class MessageHandler(Protocol):
-    async def handle_kafka_message(self, key: str, value: str):
-        pass
 
 
 class Consumer:
@@ -16,6 +14,7 @@ class Consumer:
             value_deserializer=self.json_deserializer(),
             key_deserializer=lambda v: v.decode("utf-8"),
             group_id="my-group",
+            enable_auto_commit=False
         )
         self.message_handler = message_handler
 
@@ -25,10 +24,12 @@ class Consumer:
             # Consume messages
             async for msg in self.consumer:
                 await self._process_message(msg)
+                await self.consumer.commit()
         finally:
             # Will leave consumer group; perform autocommit if enabled.
             print("closing consumer")
             await self.consumer.stop()
+
 
     async def _process_message(self):
         raise NotImplementedError("Not implemented")

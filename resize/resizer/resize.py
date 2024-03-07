@@ -1,15 +1,7 @@
-# Import the Images module from pillow
 import io
-from enum import Enum
-
 from PIL import Image
-
 from resize.settings import settings
-
-
-class ReduceType(Enum):
-    QUALITY = 1
-    THUMBNAIL = 2
+from resize.types import ReduceType
 
 
 class ImageResizer:
@@ -43,7 +35,7 @@ class ImageResizer:
 
         if size > 0.3 and quality > 5:
             print("Image size is greater than 0.3 MB")
-            return self.reduze_quality(image_data, quality=quality - 3)
+            return self._reduze_quality(image_data, quality=quality - 3)
 
         else:
             return new_byte
