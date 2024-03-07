@@ -1,7 +1,10 @@
 """Settings of the webservice."""
+
 from __future__ import annotations
 
 from pydantic_settings import BaseSettings
+
+from resize.resizer.resize import ReduceType
 
 
 class Settings(BaseSettings):
@@ -14,6 +17,8 @@ class Settings(BaseSettings):
     """
 
     build_version: str = "0.0.0"
+
+    reduce_type: ReduceType = ReduceType.QUALITY
 
     minio_host: str = "localhost"
     minio_port: int = 9000

@@ -1,4 +1,4 @@
-
+# Coffee App Image Resizer
 
 ## Kcat example messages:
 

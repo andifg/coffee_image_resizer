@@ -7,7 +7,6 @@ class ImageResizer:
     def __init__(self) -> None:
         self.s3_service = S3Service()
 
-
     async def run(self):
         print("running")
         consumer = ResizerConsumer(message_handler=self.s3_service)

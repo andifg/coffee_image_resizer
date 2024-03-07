@@ -1,7 +1,7 @@
-from aiokafka import AIOKafkaConsumer, ConsumerRecord
 import json
 from typing import Protocol
 
+from aiokafka import AIOKafkaConsumer, ConsumerRecord
 
 class MessageHandler(Protocol):
     async def handle_kafka_message(self, key: str, value: str):

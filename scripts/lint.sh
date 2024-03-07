@@ -7,9 +7,9 @@ pushd "${GIT_ROOT}" > /dev/null
 
 
 printf "Lint code with mypy \n" && \
-mypy coffee_backend tests --disallow-untyped-defs && \
+mypy resize tests --disallow-untyped-defs && \
 printf "Lint production code with pylint \n" && \
-pylint coffee_backend &&\
+pylint resize &&\
 printf "Lint test code with pylint \n" && \
 pylint tests
 

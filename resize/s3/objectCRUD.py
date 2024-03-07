@@ -1,14 +1,12 @@
-from typing import Tuple
-from resize.exceptions import ObjectNotFoundError
-from typing import Optional
+from typing import Optional, Tuple
 
 from minio import Minio  # type: ignore
 from minio import S3Error  # type: ignore
 from minio.deleteobjects import DeleteObject  # type: ignore
 
+from resize.exceptions import ObjectNotFoundError
 from resize.s3.types.readable import Readable
 from resize.settings import settings
-from resize.exceptions import ObjectNotFoundError
 
 
 class ObjectCRUD:
@@ -26,7 +24,9 @@ class ObjectCRUD:
         self.client = minio_client
         self.bucket_name = bucket_name
 
-    def create(self, filename: str, file: Readable, file_type: str, prefix: str) -> None:
+    def create(
+        self, filename: str, file: Readable, file_type: str, prefix: str
+    ) -> None:
         """Create an object in the S3 bucket.
 
         Args:
@@ -51,7 +51,9 @@ class ObjectCRUD:
             + f"version-id: {result.version_id}"
         )
 
-    def read(self, filename: Optional[str] = None, object_path: Optional[str] = None) -> Tuple[bytes, str]:
+    def read(
+        self, filename: Optional[str] = None, object_path: Optional[str] = None
+    ) -> Tuple[bytes, str]:
         """Read an object from the S3 bucket.
 
         Args:
