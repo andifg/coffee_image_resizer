@@ -20,6 +20,10 @@ class Settings(BaseSettings):
 
     log_level: str = "debug"
 
+    kafka_bootstrap_servers: str = "localhost:9094"
+    kafka_topic: str = "coffee-images"
+    kafka_consumer_group: str = "coffee-images"
+
     reduce_type: ReduceType = ReduceType.THUMBNAIL
 
     minio_host: str = "localhost"

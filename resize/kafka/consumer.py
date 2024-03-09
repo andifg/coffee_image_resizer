@@ -3,6 +3,7 @@ import logging
 
 from aiokafka import AIOKafkaConsumer, ConsumerRecord
 from resize.types import MessageHandler
+from resize.settings import settings
 
 logger = logging.getLogger('aiokafka')
 logger.setLevel(logging.INFO)
@@ -10,11 +11,11 @@ logger.setLevel(logging.INFO)
 class Consumer:
     def __init__(self, message_handler: MessageHandler):
         self.consumer = AIOKafkaConsumer(
-            "coffee-images",
-            bootstrap_servers="localhost:9094",
+            settings.kafka_topic,
+            bootstrap_servers=settings.kafka_bootstrap_servers,
             value_deserializer=lambda v: json.loads(v),
             key_deserializer=lambda v: v.decode("utf-8"),
-            group_id="my-group",
+            group_id=settings.kafka_consumer_group,
             enable_auto_commit=False
         )
         self.message_handler = message_handler
