@@ -16,7 +16,8 @@ class Consumer:
             value_deserializer=lambda v: json.loads(v),
             key_deserializer=lambda v: v.decode("utf-8"),
             group_id=settings.kafka_consumer_group,
-            enable_auto_commit=False
+            enable_auto_commit=False,
+            auto_offset_reset="earliest"
         )
         self.message_handler = message_handler
 
@@ -38,7 +39,7 @@ class ResizerConsumer(Consumer):
 
     async def _process_message(self, msg: ConsumerRecord)-> None:
         logging.info(
-            "consumed: ",
+            "consumed: %s %s %s %s %s %s",
             msg.topic,
             msg.partition,
             msg.offset,
