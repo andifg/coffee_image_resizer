@@ -2,11 +2,13 @@ import json
 import logging
 
 from aiokafka import AIOKafkaConsumer, ConsumerRecord
-from resize.types import MessageHandler
-from resize.settings import settings
 
-logger = logging.getLogger('aiokafka')
+from resize.settings import settings
+from resize.types import MessageHandler
+
+logger = logging.getLogger("aiokafka")
 logger.setLevel(logging.INFO)
+
 
 class Consumer:
     def __init__(self, message_handler: MessageHandler):
@@ -17,7 +19,7 @@ class Consumer:
             key_deserializer=lambda v: v.decode("utf-8"),
             group_id=settings.kafka_consumer_group,
             enable_auto_commit=False,
-            auto_offset_reset="earliest"
+            auto_offset_reset="earliest",
         )
         self.message_handler = message_handler
 
@@ -37,7 +39,7 @@ class ResizerConsumer(Consumer):
     def __init__(self, message_handler: MessageHandler):
         super().__init__(message_handler=message_handler)
 
-    async def _process_message(self, msg: ConsumerRecord)-> None:
+    async def _process_message(self, msg: ConsumerRecord) -> None:
         logging.info(
             "consumed: %s %s %s %s %s %s",
             msg.topic,

@@ -1,5 +1,7 @@
 import io
+
 from PIL import Image
+
 from resize.settings import settings
 from resize.types import ReduceType
 

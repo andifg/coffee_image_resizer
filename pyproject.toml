@@ -11,6 +11,7 @@ pillow = "^10.2.0"
 aiokafka = "^0.10.0"
 minio = "^7.2.4"
 pydantic-settings = "^2.2.1"
+pytest-cov = "^4.1.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -29,3 +30,14 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts = "--cov-report term-missing --cov=resize"
+testpaths = ["tests"]
+
+[tool.isort]
+line_length = 80
+profile = "black"
+
+[tool.black]
+line-length = 80

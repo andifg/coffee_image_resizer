@@ -3,25 +3,22 @@ from dataclasses import dataclass
 from typing import AsyncGenerator, Generator
 from uuid import UUID
 
-from kafka import KafkaProducer, KafkaConsumer
-from resize.settings import settings
-
 import pytest
 import pytest_asyncio
+from kafka import KafkaConsumer, KafkaProducer
 from pytest_docker.plugin import Services
+
+from resize.settings import settings
 
 logging.getLogger().setLevel(logging.DEBUG)
 
 logging.getLogger("kafka").setLevel(logging.INFO)
 
 
-
-
 @dataclass
 class TestKafkaSession:
     sync_producer: KafkaProducer
     __test__: bool = False
-
 
 
 @pytest_asyncio.fixture(name="kafka_service")
@@ -37,7 +34,9 @@ async def fixture_kafka_service(
 
 
 @pytest_asyncio.fixture()
-async def init_kakfa(monkeypatch: pytest.MonkeyPatch,kafka_service: str) -> AsyncGenerator:
+async def init_kakfa(
+    monkeypatch: pytest.MonkeyPatch, kafka_service: str
+) -> AsyncGenerator:
 
     sync_producer: KafkaProducer = KafkaProducer(
         bootstrap_servers=kafka_service,
@@ -47,7 +46,6 @@ async def init_kakfa(monkeypatch: pytest.MonkeyPatch,kafka_service: str) -> Asyn
 
     monkeypatch.setattr(settings, "kafka_bootstrap_servers", kafka_service)
 
-
     yield TestKafkaSession(sync_producer=sync_producer)
     cleanup_kafka_topic(sync_producer)
 
@@ -55,13 +53,16 @@ async def init_kakfa(monkeypatch: pytest.MonkeyPatch,kafka_service: str) -> Asyn
 def test_kafka(bootstrap_server: str) -> bool:
     print("Try kafka connection")
 
-    print("BOOOTSTRAP " , bootstrap_server)
+    print("BOOOTSTRAP ", bootstrap_server)
     try:
-        consumer = KafkaConsumer(group_id="test", bootstrap_servers=[bootstrap_server])
+        consumer = KafkaConsumer(
+            group_id="test", bootstrap_servers=[bootstrap_server]
+        )
         if consumer.bootstrap_connected():
             return True
     except Exception as e:
         return False
+
 
 # To be done
 def cleanup_kafka_topic(producer: KafkaProducer) -> None:
