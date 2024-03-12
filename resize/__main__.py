@@ -2,4 +2,5 @@ import asyncio
 
 from resize.main import ImageResizer
 
-asyncio.run(ImageResizer().run())
+if __name__ == "__main__":
+    asyncio.run(ImageResizer().run())
