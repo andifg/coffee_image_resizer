@@ -1,12 +1,10 @@
-from typing import Optional, Tuple
+from typing import BinaryIO, Optional, Tuple
 
 from minio import Minio  # type: ignore
 from minio import S3Error  # type: ignore
-from minio.deleteobjects import DeleteObject  # type: ignore
 
 from resize.exceptions import ObjectNotFoundError
 from resize.settings import settings
-from resize.types import Readable
 
 
 class ObjectCRUD:
@@ -25,7 +23,7 @@ class ObjectCRUD:
         self.bucket_name = bucket_name
 
     def create(
-        self, filename: str, file: Readable, file_type: str, prefix: str
+        self, filename: str, file: BinaryIO, file_type: str, prefix: str
     ) -> None:
         """Create an object in the S3 bucket.
 

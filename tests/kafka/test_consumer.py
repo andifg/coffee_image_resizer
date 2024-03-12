@@ -14,13 +14,16 @@ async def test_consumer_consume(
 ) -> None:
     """Test kafka message consumption.
 
-    This test checks if the consume method of the ResizerConsumer class is working as expected.
-    It sends a message to the Kafka topic, starts the consumer, and checks if the message is consumed correctly.
-    The test also checks if the appropriate log messages are generated.
+    This test checks if the consume method of the ResizerConsumer class is
+    working as expected. It sends a message to the Kafka topic, starts the
+    consumer, and checks if the message is consumed correctly. The test also
+    checks if the appropriate log messages are generated.
 
     Args:
-        init_kakfa (TestKafkaSession): A fixture that initializes a Kafka session for testing.
-        caplog (pytest.LogCaptureFixture): A fixture that captures log messages for testing.
+        init_kakfa (TestKafkaSession): A fixture that initializes a Kafka
+            session for testing.
+        caplog (pytest.LogCaptureFixture): A fixture that captures log messages
+            for testing.
     """
 
     handler_mock = AsyncMock()

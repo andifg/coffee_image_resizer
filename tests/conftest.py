@@ -1,7 +1,6 @@
 import logging
 from dataclasses import dataclass
-from typing import AsyncGenerator, Generator
-from uuid import UUID
+from typing import AsyncGenerator
 
 import pytest
 import pytest_asyncio
@@ -26,6 +25,7 @@ class TestKafkaSession:
         __test__ (bool): Flag indicating whether the class should be
             considered for testing.
     """
+
     sync_producer: KafkaProducer
     __test__: bool = False
 
@@ -34,7 +34,7 @@ class TestKafkaSession:
 async def fixture_kafka_service(
     docker_ip: str, docker_services: Services
 ) -> str:
-    """ Fixture to wait for Kafka dev container to become responsive.
+    """Fixture to wait for Kafka dev container to become responsive.
 
     Args:
         docker_ip (str): The IP address of the Docker container.
@@ -59,7 +59,7 @@ async def fixture_kafka_service(
 async def init_kakfa(
     monkeypatch: pytest.MonkeyPatch, kafka_service: str
 ) -> AsyncGenerator:
-    """ Yield a Kafka test sesson.
+    """Yield a Kafka test sesson.
 
     Args:
         monkeypatch (pytest.MonkeyPatch): The pytest monkeypatch fixture.
@@ -80,7 +80,7 @@ async def init_kakfa(
 
 
 def test_kafka(bootstrap_server: str) -> bool:
-    """ Test the connection to a Kafka server.
+    """Test the connection to a Kafka server.
 
     Args:
         bootstrap_server (str): The address of the Kafka bootstrap server.
@@ -95,9 +95,6 @@ def test_kafka(bootstrap_server: str) -> bool:
         consumer = KafkaConsumer(
             group_id="test", bootstrap_servers=[bootstrap_server]
         )
-        if consumer.bootstrap_connected():
-            return True
-        else:
-            return False
-    except UnrecognizedBrokerVersion as e:
+        return bool(consumer.bootstrap_connected())
+    except UnrecognizedBrokerVersion:
         return False

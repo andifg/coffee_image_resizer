@@ -5,7 +5,6 @@ import pytest
 
 from resize.kafka.consumer import ResizerConsumer
 from resize.main import ImageResizer
-from resize.s3.service import S3Service
 
 
 @patch("resize.s3.service.S3Service")

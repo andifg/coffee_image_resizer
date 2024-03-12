@@ -1,13 +1,16 @@
+import logging
+
 from minio import Minio
 
 from resize.exceptions import ObjectNotFoundError
 from resize.resizer.resize import ImageResizer
-from resize.s3.objectCRUD import ObjectCRUD
+from resize.s3.object import ObjectCRUD
 from resize.settings import settings
 
 
 class S3Service:
     def __init__(self) -> None:
+        """Initialize the Service class."""
         self.object_crud = ObjectCRUD(
             minio_client=Minio(
                 f"{settings.minio_host}:{settings.minio_port}",
@@ -21,7 +24,17 @@ class S3Service:
         self.image_resizer = ImageResizer()
 
     async def handle_kafka_message(self, key: str, value: str) -> None:
-        print(f"Handling message: {key} - {value}")
+        """Handles a Kafka message
+
+        This method fulfills the MessageHandler protocol. It processes a
+        Kafka message by managing the download, resizing an storing of an
+        image identified by the key of the message.
+
+        Args:
+            key (str): The key of the Kafka message.
+            value (str): The value of the Kafka message.
+        """
+        logging.debug("Handling message: %s - %s", key, value)
 
         _, prefix, object_path = key.split("/")
 
@@ -40,7 +53,7 @@ class S3Service:
             )
 
         except ObjectNotFoundError:
-            print(f"Object not found: {key}")
+            logging.info("Object with key %s not found in S3", key)
             return
 
-        print(f"Message handled: {key} - {value}")
+        logging.info("Resized and stored image: %s", key)
