@@ -9,7 +9,19 @@ from tests.conftest import TestKafkaSession
 
 
 @pytest.mark.asyncio
-async def test_consumer_consume(init_kakfa: TestKafkaSession):
+async def test_consumer_consume(
+    init_kakfa: TestKafkaSession, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Test kafka message consumption.
+
+    This test checks if the consume method of the ResizerConsumer class is working as expected.
+    It sends a message to the Kafka topic, starts the consumer, and checks if the message is consumed correctly.
+    The test also checks if the appropriate log messages are generated.
+
+    Args:
+        init_kakfa (TestKafkaSession): A fixture that initializes a Kafka session for testing.
+        caplog (pytest.LogCaptureFixture): A fixture that captures log messages for testing.
+    """
 
     handler_mock = AsyncMock()
 
@@ -38,6 +50,12 @@ async def test_consumer_consume(init_kakfa: TestKafkaSession):
 
     handler_mock.handle_kafka_message.assert_awaited_once_with(
         "origin/12345678", {"a": "b"}
+    )
+
+    assert "consumer started" in caplog.text
+    assert "Handled message and committed" in caplog.text
+    assert (
+        "consumed: coffee-images 0 0 origin/12345678 {'a': 'b'}" in caplog.text
     )
 
 

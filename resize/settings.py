@@ -18,7 +18,10 @@ class Settings(BaseSettings):
 
     build_version: str = "0.0.0"
 
-    log_level: str = "debug"
+    log_level: str = "info"
+
+    thumbnail_width: int = 1200
+    thumbnail_format: str = "JPEG"
 
     kafka_bootstrap_servers: str = "localhost:9094"
     kafka_topic: str = "coffee-images"
