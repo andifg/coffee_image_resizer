@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from resize.exceptions import ObjectNotFoundError
-from resize.resizer.resize import ImageResizer
+from resize.resizer.image_resizer import ImageResizer
 from resize.s3.object import ObjectCRUD
 from resize.s3.service import S3Service
 

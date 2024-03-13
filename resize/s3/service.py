@@ -3,7 +3,7 @@ import logging
 from minio import Minio
 
 from resize.exceptions import ObjectNotFoundError
-from resize.resizer.resize import ImageResizer
+from resize.resizer.image_resizer import ImageResizer
 from resize.s3.object import ObjectCRUD
 from resize.settings import settings
 

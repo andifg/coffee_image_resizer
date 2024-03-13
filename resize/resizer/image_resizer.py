@@ -74,6 +74,9 @@ class ImageResizer:
         Returns:
             io.BytesIO: The thumbnail image as a BytesIO object.
         """
+
+        logging.debug("Creating thumbnail")
+
         with io.BytesIO(image_data) as data:
             image = Image.open(data)
 
@@ -92,7 +95,7 @@ class ImageResizer:
 
             size = round(len(new_byte.getvalue()) / (1024 * 1024), 2)
 
-            logging.debug("File Size in MegaBytes is %s", size)
+            logging.debug("New File Size in MegaBytes is %s", size)
 
             new_byte.seek(0)
 

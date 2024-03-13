@@ -1,4 +1,3 @@
-import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -17,7 +16,7 @@ async def test_image_resizer_run(
 ) -> None:
     """Test the run method of the ImageResizer class."""
 
-    consume_mock.return_value = asyncio.sleep(0)
+    consume_mock.return_value = None
 
     s3_service_mock = MagicMock()
 
