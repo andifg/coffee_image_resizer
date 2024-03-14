@@ -96,5 +96,5 @@ def test_kafka(bootstrap_server: str) -> bool:
             group_id="test", bootstrap_servers=[bootstrap_server]
         )
         return bool(consumer.bootstrap_connected())
-    except UnrecognizedBrokerVersion:
+    except (UnrecognizedBrokerVersion, ValueError):
         return False
