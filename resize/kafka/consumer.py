@@ -2,6 +2,7 @@ import json
 import logging
 
 from aiokafka import AIOKafkaConsumer, ConsumerRecord
+from aiokafka.helpers import create_ssl_context
 
 from resize.settings import settings
 from resize.types import MessageHandler
@@ -18,6 +19,13 @@ class Consumer:
             message_handler (MessageHandler): The message handler used to
                 process incoming messages.
         """
+        security_context = None
+
+        if settings.kafka_ssl_protocol == "SSL":
+            security_context = create_ssl_context(
+                cafile=settings.kafka_ssl_cafile,
+            )
+
         self.consumer = AIOKafkaConsumer(
             settings.kafka_topic,
             bootstrap_servers=settings.kafka_bootstrap_servers,
@@ -26,6 +34,8 @@ class Consumer:
             group_id=settings.kafka_consumer_group,
             enable_auto_commit=False,
             auto_offset_reset="earliest",
+            security_protocol=settings.kafka_ssl_protocol.value,
+            ssl_context=security_context,
         )
         self.message_handler = message_handler
 
