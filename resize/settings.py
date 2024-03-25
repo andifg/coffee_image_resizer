@@ -22,6 +22,7 @@ class Settings(BaseSettings):
 
     thumbnail_width: int = 1200
     thumbnail_format: str = "JPEG"
+    reduce_type: ReduceType = ReduceType.THUMBNAIL
 
     kafka_bootstrap_servers: str = "localhost:9094"
     kafka_topic: str = "coffee-images"
@@ -32,14 +33,10 @@ class Settings(BaseSettings):
     kafka_sasl_username: str | None = None
     kafka_sasl_password: str | None = None
 
-    reduce_type: ReduceType = ReduceType.THUMBNAIL
-
     minio_host: str = "localhost"
     minio_port: int = 9000
-
     minio_access_key: str = "minio-root-user"
     minio_secret_key: str = "minio-root-password"
-
     minio_original_images_prefix: str = "original"
     minio_coffee_images_bucket: str = "coffee-images"
 
