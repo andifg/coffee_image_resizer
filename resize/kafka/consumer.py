@@ -5,7 +5,7 @@ from aiokafka import AIOKafkaConsumer, ConsumerRecord
 from aiokafka.helpers import create_ssl_context
 
 from resize.settings import settings
-from resize.types import MessageHandler
+from resize.types import KafkaSSLProtocol, MessageHandler
 
 
 class Consumer:
@@ -21,7 +21,7 @@ class Consumer:
         """
         security_context = None
 
-        if settings.kafka_ssl_protocol == "SSL":
+        if settings.kafka_ssl_protocol == KafkaSSLProtocol.SSL:
             security_context = create_ssl_context(
                 cafile=settings.kafka_ssl_cafile,
             )
