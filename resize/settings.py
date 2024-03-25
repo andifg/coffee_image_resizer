@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pydantic_settings import BaseSettings
 
-from resize.types import KafkaSSLProtocol, ReduceType
+from resize.types import KafkaSecurityProtocol, ReduceType
 
 
 class Settings(BaseSettings):
@@ -27,9 +27,11 @@ class Settings(BaseSettings):
     kafka_bootstrap_servers: str = "localhost:9094"
     kafka_topic: str = "coffee-images"
     kafka_consumer_group: str = "coffee-images"
-    kafka_ssl_protocol: KafkaSSLProtocol = KafkaSSLProtocol.PLAINTEXT
+    kafka_security_protocol: KafkaSecurityProtocol = (
+        KafkaSecurityProtocol.PLAINTEXT
+    )
     kafka_ssl_cafile: str = ""
-    kafka_sasl_mechanism: str = "PLAIN"
+    kafka_sasl_mechanism: str | None = None
     kafka_sasl_username: str | None = None
     kafka_sasl_password: str | None = None
 

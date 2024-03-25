@@ -5,7 +5,7 @@ from aiokafka import AIOKafkaConsumer, ConsumerRecord
 from aiokafka.helpers import create_ssl_context
 
 from resize.settings import settings
-from resize.types import KafkaSSLProtocol, MessageHandler
+from resize.types import KafkaSecurityProtocol, MessageHandler
 
 
 class Consumer:
@@ -21,7 +21,8 @@ class Consumer:
         """
         security_context = None
 
-        if settings.kafka_ssl_protocol == KafkaSSLProtocol.SSL:
+        if settings.kafka_security_protocol == KafkaSecurityProtocol.SASL_SSL:
+            logging.debug("Using SSL for Kafka connection")
             security_context = create_ssl_context(
                 cafile=settings.kafka_ssl_cafile,
             )
@@ -34,10 +35,15 @@ class Consumer:
             group_id=settings.kafka_consumer_group,
             enable_auto_commit=False,
             auto_offset_reset="earliest",
-            security_protocol=settings.kafka_ssl_protocol.value,
+            security_protocol=settings.kafka_security_protocol.value,
             ssl_context=security_context,
+            sasl_plain_username=settings.kafka_sasl_username,
+            sasl_plain_password=settings.kafka_sasl_password,
+            sasl_mechanism=settings.kafka_sasl_mechanism,
         )
         self.message_handler = message_handler
+
+        logging.debug("Consumer initialized %s", self.consumer)
 
     async def consume(self) -> None:
         """Starts consuming messages from the Kafka topic.
