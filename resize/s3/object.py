@@ -1,3 +1,4 @@
+import logging
 from typing import BinaryIO, Optional, Tuple
 
 from minio import Minio  # type: ignore
@@ -44,9 +45,12 @@ class ObjectCRUD:
             part_size=10 * 1024 * 1024,
             metadata={"filetype": file_type},
         )
-        print(
-            f"created {result.object_name} object; etag: {result.etag}, "
-            + f"version-id: {result.version_id}"
+
+        logging.info(
+            "created %s object; etag: %s, version-id: %s",
+            result.object_name,
+            result.etag,
+            result.version_id,
         )
 
     def read(
