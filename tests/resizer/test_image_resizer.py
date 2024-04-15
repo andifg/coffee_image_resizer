@@ -28,10 +28,15 @@ def test_image_resizer_create_thumbnail_image(
 
     resizer = ImageResizer()
 
-    image_data = Image.new("RGB", (4000, 4000))
+    image_data = Image.new("RGB", (2400, 3200))
     in_memory_bytes = io.BytesIO()
 
-    image_data.save(in_memory_bytes, format="JPEG")
+    # Keep exif data
+    image_data.save(
+        in_memory_bytes,
+        format="JPEG",
+        exif=image_data.getexif(),
+    )
 
     # pylint: disable=protected-access
     thumbnail = resizer._create_thumbnail(in_memory_bytes.getvalue())
@@ -41,6 +46,6 @@ def test_image_resizer_create_thumbnail_image(
 
     resized_image = Image.open(thumbnail)
 
-    assert resized_image.size == (1200, 1200)
+    assert resized_image.size == (1200, 1600)
 
     assert "File Size in MegaBytes is 0.01" in caplog.text

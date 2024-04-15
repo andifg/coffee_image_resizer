@@ -1,7 +1,7 @@
 import io
 import logging
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 from resize.settings import settings
 from resize.types import ReduceType
@@ -79,8 +79,9 @@ class ImageResizer:
 
         with io.BytesIO(image_data) as data:
             image = Image.open(data)
+            image = ImageOps.exif_transpose(image)
 
-            factor = max(image.size) / settings.thumbnail_width
+            factor = image.size[0] / settings.thumbnail_width
 
             width = int(image.size[0] / factor)
             height = int(image.size[1] / factor)
@@ -90,7 +91,10 @@ class ImageResizer:
             new_byte = io.BytesIO()
 
             image.save(
-                new_byte, format=settings.thumbnail_format, optimize=True
+                new_byte,
+                format=settings.thumbnail_format,
+                optimize=True,
+                exif=image.getexif()
             )
 
             size = round(len(new_byte.getvalue()) / (1024 * 1024), 2)
