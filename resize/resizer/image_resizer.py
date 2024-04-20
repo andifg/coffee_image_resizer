@@ -12,7 +12,7 @@ class ImageResizer:
     def __init__(self) -> None:
         self.strategy = settings.reduce_type
 
-    def resize_image(self, image_data: bytes) -> io.BytesIO:
+    def resize_image(self, image_data: bytes, filetype: str) -> io.BytesIO:
         """Resize the given image based on the selected strategy.
 
         Args:
@@ -28,7 +28,7 @@ class ImageResizer:
             return self._reduze_quality(image_data)
 
         if self.strategy == ReduceType.THUMBNAIL:
-            return self._create_thumbnail(image_data)
+            return self._create_thumbnail(image_data, filetype)
 
         raise ValueError("Invalid ReduceType")
 
@@ -65,7 +65,7 @@ class ImageResizer:
 
         return new_byte
 
-    def _create_thumbnail(self, image_data: bytes) -> io.BytesIO:
+    def _create_thumbnail(self, image_data: bytes, filetype: str) -> io.BytesIO:
         """Create a thumbnail image without changing the aspect ratio.
 
         Args:
@@ -83,18 +83,30 @@ class ImageResizer:
 
             factor = image.size[0] / settings.thumbnail_width
 
-            width = int(image.size[0] / factor)
-            height = int(image.size[1] / factor)
+            if factor >= 1:
+                logging.debug(
+                    "Image is larger than the thumbnail size,"
+                    "so resizing with factor %s.",
+                    factor,
+                )
 
-            image.thumbnail((width, height), resample=Image.Resampling.LANCZOS)
+                width = int(image.size[0] / factor)
+                height = int(image.size[1] / factor)
+
+                image.thumbnail(
+                    (width, height), resample=Image.Resampling.LANCZOS
+                )
+
+            else:
+                logging.debug(
+                    "Image is smaller than the thumbnail size,"
+                    "so keeping the original as small image."
+                )
 
             new_byte = io.BytesIO()
 
             image.save(
-                new_byte,
-                format=settings.thumbnail_format,
-                optimize=True,
-                exif=image.getexif()
+                new_byte, format=filetype, optimize=True, exif=image.getexif()
             )
 
             size = round(len(new_byte.getvalue()) / (1024 * 1024), 2)
