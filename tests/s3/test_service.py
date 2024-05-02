@@ -40,7 +40,7 @@ async def test_s3_service_handle_kafka_message(
     )
 
     object_crud_read_mock.assert_called_once_with(object_path="prefix/image-id")
-    image_resizer_mock.assert_called_once_with(b"test_value")
+    image_resizer_mock.assert_called_once_with(b"test_value", "TFLPU")
     object_crud_create_mock.assert_called_once_with(
         filename="image-id",
         file=b"test_value_small",

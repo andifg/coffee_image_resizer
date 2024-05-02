@@ -43,7 +43,7 @@ class S3Service:
                 object_path=f"{prefix}/{object_path}"
             )
 
-            resized_image = self.image_resizer.resize_image(image)
+            resized_image = self.image_resizer.resize_image(image, filetype)
 
             self.object_crud.create(
                 filename=object_path,
