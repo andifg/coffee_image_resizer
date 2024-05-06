@@ -4,8 +4,12 @@ import logging
 from aiokafka import AIOKafkaConsumer, ConsumerRecord
 from aiokafka.helpers import create_ssl_context
 
+from resize.config.log_levels import log_levels
 from resize.settings import settings
 from resize.types import KafkaSecurityProtocol, MessageHandler
+
+logger = logging.getLogger("aiokafka")
+logger.setLevel(log_levels.get(settings.log_level, logging.INFO))
 
 
 class Consumer:

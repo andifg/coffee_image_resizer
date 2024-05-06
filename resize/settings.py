@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     build_version: str = "0.0.0"
 
     log_level: str = "info"
+    kafka_log_level: str = "info"
 
     thumbnail_width: int = 1200
     thumbnail_format: str = "JPEG"
