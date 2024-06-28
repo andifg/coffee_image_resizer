@@ -1,7 +1,7 @@
 FROM registry.access.redhat.com/ubi9/ubi-minimal:9.3 as base
 
 RUN microdnf install python3.11 -y && /bin/python3.11 -m ensurepip --upgrade && \
-    pip3 install --upgrade pip && pip3 install poetry==1.3.2
+    pip3 install --upgrade pip && pip3 install poetry==1.8.3
 
 ENV POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=1 \

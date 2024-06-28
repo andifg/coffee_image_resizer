@@ -8,7 +8,6 @@ from resize.types import ReduceType
 
 
 class ImageResizer:
-
     def __init__(self) -> None:
         self.strategy = settings.reduce_type
 
