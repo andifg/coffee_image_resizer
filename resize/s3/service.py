@@ -11,6 +11,7 @@ from resize.settings import settings
 class S3Service:
     def __init__(self) -> None:
         """Initialize the Service class."""
+        self.bucket_name = settings.minio_coffee_images_bucket
         self.object_crud = ObjectCRUD(
             minio_client=Minio(
                 f"{settings.minio_host}:{settings.minio_port}",
@@ -18,7 +19,7 @@ class S3Service:
                 settings.minio_secret_key,
                 secure=False,
             ),
-            bucket_name=settings.minio_coffee_images_bucket,
+            bucket_name=self.bucket_name,
         )
 
         self.image_resizer = ImageResizer()
@@ -36,24 +37,25 @@ class S3Service:
         """
         logging.debug("Handling message: %s - %s", key, value)
 
-        _, prefix, object_path = key.split("/")
+        key = key.replace(f"{self.bucket_name}/", "")
+        path, key = key.split("original/")
 
         try:
             image, filetype = self.object_crud.read(
-                object_path=f"{prefix}/{object_path}"
+                filepath=f"{path}original", filename=key
             )
 
             resized_image = self.image_resizer.resize_image(image, filetype)
 
             self.object_crud.create(
-                filename=object_path,
+                filepath=f"{path}small",
+                filename=key,
                 file=resized_image,
                 file_type=filetype,
-                prefix="small",
             )
 
         except ObjectNotFoundError:
-            logging.info("Object with key %s not found in S3", key)
+            logging.info("Object %s not found in S3", f"{path}original/{key}")
             return
 
-        logging.info("Resized and stored image: %s", key)
+        logging.info("Resized and stored image: %s%s", f"{path}small", key)

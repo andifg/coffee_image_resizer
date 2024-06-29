@@ -26,6 +26,7 @@ async def test_s3_service_handle_kafka_message(
     object_crud_read_mock: MagicMock,
     image_resizer_mock: MagicMock,
     object_crud_create_mock: MagicMock,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test the handle_kafka_message method of the S3Service class.
 
@@ -36,17 +37,21 @@ async def test_s3_service_handle_kafka_message(
 
     s3_service = S3Service()
     await s3_service.handle_kafka_message(
-        "bucket/prefix/image-id", "test_value"
+        "coffee-images/coffee_bean/original/image-id", "test_value"
     )
 
-    object_crud_read_mock.assert_called_once_with(object_path="prefix/image-id")
+    object_crud_read_mock.assert_called_once_with(
+        filepath="coffee_bean/original", filename="image-id"
+    )
     image_resizer_mock.assert_called_once_with(b"test_value", "TFLPU")
     object_crud_create_mock.assert_called_once_with(
+        filepath="coffee_bean/small",
         filename="image-id",
         file=b"test_value_small",
         file_type="TFLPU",
-        prefix="small",
     )
+
+    assert "Resized and stored image: coffee_bean/smallimage-id" in caplog.text
 
 
 @patch.object(ObjectCRUD, "create", return_value=None)
@@ -68,13 +73,13 @@ async def test_s3_service_handle_kafka_message_object_not_found(
     s3_service = S3Service()
     object_crud_read_mock.side_effect = ObjectNotFoundError("Object not found")
     await s3_service.handle_kafka_message(
-        "bucket/prefix/image-id", "test_value"
+        "coffee-images/coffee_bean/original/image-id", "test_value"
     )
 
-    object_crud_read_mock.assert_called_once_with(object_path="prefix/image-id")
+    object_crud_read_mock.assert_called_once_with(
+        filepath="coffee_bean/original", filename="image-id"
+    )
     image_resizer_mock.assert_not_called()
     object_crud_create_mock.assert_not_called()
 
-    assert (
-        "Object with key bucket/prefix/image-id not found in S3" in caplog.text
-    )
+    assert "Object coffee_bean/original/image-id not found in S3" in caplog.text
