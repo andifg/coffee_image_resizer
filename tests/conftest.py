@@ -74,7 +74,7 @@ async def fixture_kafka_service() -> AsyncGenerator[str, None]:
         exposed_port = container.get_exposed_port(9095)
         bootstrap_server = f"{host_ip}:{exposed_port}"
         wait_for_logs(
-            container=container, predicate="Kafka Server started", timeout=15
+            container=container, predicate="Kafka Server started", timeout=120
         )
 
         yield bootstrap_server
