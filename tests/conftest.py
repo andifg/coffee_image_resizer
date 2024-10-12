@@ -5,8 +5,9 @@ from typing import AsyncGenerator
 import pytest
 import pytest_asyncio
 from kafka import KafkaConsumer, KafkaProducer
-from kafka.errors import UnrecognizedBrokerVersion
-from pytest_docker.plugin import Services
+from kafka.errors import NoBrokersAvailable
+from testcontainers.core.container import DockerContainer
+from testcontainers.core.waiting_utils import wait_for_logs  # type: ignore
 
 from resize.settings import settings
 
@@ -31,9 +32,7 @@ class TestKafkaSession:
 
 
 @pytest_asyncio.fixture(name="kafka_service")
-async def fixture_kafka_service(
-    docker_ip: str, docker_services: Services
-) -> str:
+async def fixture_kafka_service() -> AsyncGenerator[str, None]:
     """Fixture to wait for Kafka dev container to become responsive.
 
     Args:
@@ -47,12 +46,45 @@ async def fixture_kafka_service(
         TimeoutError: If the Kafka service does not become responsive within
             the timeout period.
     """
-    port = docker_services.port_for("kafka", 9095)
-    bootstrap_server = f"{docker_ip}:{port}"
-    docker_services.wait_until_responsive(
-        timeout=30.0, pause=0.1, check=lambda: test_kafka(bootstrap_server)
+
+    kafka_testcontainer = (
+        DockerContainer("docker.io/bitnami/kafka:3.6")
+        .with_bind_ports(9095, 9095)
+        .with_env("KAFKA_CFG_NODE_ID", "0")
+        .with_env("KAFKA_CFG_PROCESS_ROLES", "controller,broker")
+        .with_env("KAFKA_CFG_CONTROLLER_QUORUM_VOTERS", "0@0.0.0.0:9093")
+        .with_env(
+            "KAFKA_CFG_LISTENERS",
+            "PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://0.0.0.0:9095",
+        )
+        .with_env(
+            "KAFKA_CFG_ADVERTISED_LISTENERS",
+            "PLAINTEXT://:9092,EXTERNAL://127.0.0.1:9095",
+        )
+        .with_env(
+            "KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP",
+            "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT",
+        )
+        .with_env("KAFKA_CFG_CONTROLLER_LISTENER_NAMES", "CONTROLLER")
+        .with_env("KAFKA_CFG_INTER_BROKER_LISTENER_NAME", "PLAINTEXT")
     )
-    return bootstrap_server
+
+    with kafka_testcontainer as container:
+        host_ip = container.get_container_host_ip()
+        exposed_port = container.get_exposed_port(9095)
+        bootstrap_server = f"{host_ip}:{exposed_port}"
+        wait_for_logs(
+            container=container, predicate="Kafka Server started", timeout=15
+        )
+
+        yield bootstrap_server
+
+    # port = docker_services.port_for("kafka", 9095)
+    # bootstrap_server = f"{docker_ip}:{port}"
+    # docker_services.wait_until_responsive(
+    #     timeout=30.0, pause=0.1, check=lambda: test_kafka(bootstrap_server)
+    # )
+    # return bootstrap_server
 
 
 @pytest_asyncio.fixture()
@@ -95,6 +127,10 @@ def test_kafka(bootstrap_server: str) -> bool:
         consumer = KafkaConsumer(
             group_id="test", bootstrap_servers=[bootstrap_server]
         )
-        return bool(consumer.bootstrap_connected())
-    except (UnrecognizedBrokerVersion, ValueError):
+        print("Connected to Kafka")
+        consumer.bootstrap_connected()
+        return True
+
+    except (NoBrokersAvailable, ValueError) as e:
+        print(e)
         return False

@@ -46,18 +46,16 @@ docker build -t resizer:v1 -f ./Containerfile .
 docker run -it -p 9000:8000  --name resizer resizer:v1
 ```
 
-## Local execution together with other coffee app components
+## Local End To End Dev & Test Environment
 
-In order to test the whole coffee app with backend, frontend and resizer locally
-you can run the resizer without a container locally. If you run the coffee
-backend tests docker-compose before, the default settings will connect the
-image resizer with the kafka instance defined as part of this.
-
+In order to execute local end to end test for the coffee app its possible to
+start the docker-compose inside the devservice directory that is part of the
+[backend repository](https://github.com/andifg/coffee_backend.git).
 
 ## Kcat example messages:
 
 Kcat can be used to send test messages to the running kafka cluster:
 
 ```bash
-echo 'coffee-images/original/018e1559-fe33-798d-b184-6f97ffd630a7:{"data":"3"}' | kcat -b localhost:9095 -t coffee-images -P -K :
+echo 'coffee-images/original/018e1559-fe33-798d-b184-6f97ffd630a7:{"data":"3"}' | kcat -b localhost:9094 -t coffee-images -P -K :
 ```
