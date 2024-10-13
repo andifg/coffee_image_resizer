@@ -4,9 +4,8 @@ from typing import AsyncGenerator
 
 import pytest
 import pytest_asyncio
-from kafka import KafkaConsumer, KafkaProducer
-from kafka.errors import UnrecognizedBrokerVersion
-from pytest_docker.plugin import Services
+from kafka import KafkaProducer
+from testcontainers.kafka import RedpandaContainer
 
 from resize.settings import settings
 
@@ -31,9 +30,7 @@ class TestKafkaSession:
 
 
 @pytest_asyncio.fixture(name="kafka_service")
-async def fixture_kafka_service(
-    docker_ip: str, docker_services: Services
-) -> str:
+async def fixture_kafka_service() -> AsyncGenerator[str, None]:
     """Fixture to wait for Kafka dev container to become responsive.
 
     Args:
@@ -47,12 +44,12 @@ async def fixture_kafka_service(
         TimeoutError: If the Kafka service does not become responsive within
             the timeout period.
     """
-    port = docker_services.port_for("kafka", 9095)
-    bootstrap_server = f"{docker_ip}:{port}"
-    docker_services.wait_until_responsive(
-        timeout=30.0, pause=0.1, check=lambda: test_kafka(bootstrap_server)
-    )
-    return bootstrap_server
+
+    with RedpandaContainer() as redpanda:
+        connection = redpanda.get_bootstrap_server()
+
+        print(connection)
+        yield connection
 
 
 @pytest_asyncio.fixture()
@@ -77,24 +74,3 @@ async def init_kakfa(
     monkeypatch.setattr(settings, "kafka_bootstrap_servers", kafka_service)
 
     yield TestKafkaSession(sync_producer=sync_producer)
-
-
-def test_kafka(bootstrap_server: str) -> bool:
-    """Test the connection to a Kafka server.
-
-    Args:
-        bootstrap_server (str): The address of the Kafka bootstrap server.
-
-    Returns:
-        bool: True if the connection is successful, False otherwise.
-    """
-    print("Try kafka connection")
-
-    print("BOOOTSTRAP ", bootstrap_server)
-    try:
-        consumer = KafkaConsumer(
-            group_id="test", bootstrap_servers=[bootstrap_server]
-        )
-        return bool(consumer.bootstrap_connected())
-    except (UnrecognizedBrokerVersion, ValueError):
-        return False
